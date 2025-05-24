@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // import { Podcast } from './search/podcast.entity';
 // import { SearchModule } from './search/search.module';
 import { SearchModule } from './search/search.module';
+import { Podcast } from './search/entities/podcast.entity';
 
 @Module({
   imports: [
@@ -20,12 +21,11 @@ import { SearchModule } from './search/search.module';
         username: config.get('DB_USERNAME'),
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
-        // entities: [Podcast],
+        entities: [Podcast],
         synchronize: true,
       }),
     }),
     SearchModule,
-    // SearchModule,
   ],
 })
 export class AppModule {}

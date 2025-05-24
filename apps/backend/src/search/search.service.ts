@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { CreateSearchDto } from './dto/create-search.dto';
-import { UpdateSearchDto } from './dto/update-search.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Podcast } from './entities/podcast.entity';
+import { Repository } from 'typeorm';
+import axios from 'axios';
 
 @Injectable()
 export class SearchService {
-  create(createSearchDto: CreateSearchDto) {
-    return 'This action adds a new search';
-  }
+  constructor(
+    @InjectRepository(Podcast)
+    private podcastRepo: Repository<Podcast>,
+  ) {}
 
-  findAll() {
-    return `This action returns all search`;
-  }
+  async search(term: string): Promise<Podcast[]> {
+    const res = await axios.get(
+      `https://itunes.apple.com/search?media=podcast&term=${encodeURIComponent(term)}`,
+    );
 
-  findOne(id: number) {
-    return `This action returns a #${id} search`;
-  }
+    const items = res.data.results.map((item) => {
+      return this.podcastRepo.create({
+        title: item.collectionName,
+        image_url: item.artworkUrl600,
+        itunes_url: item.collectionViewUrl,
+        description: item.description || '',
+        publisher: item.artistName || '',
+      });
+    });
 
-  update(id: number, updateSearchDto: UpdateSearchDto) {
-    return `This action updates a #${id} search`;
-  }
+    await this.podcastRepo.clear();
 
-  remove(id: number) {
-    return `This action removes a #${id} search`;
+    await this.podcastRepo.save(items);
+
+    return items;
   }
 }
