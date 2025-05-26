@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // import { SearchModule } from './search/search.module';
 import { SearchModule } from './search/search.module';
 import { Podcast } from './search/entities/podcast.entity';
+import { Episode } from './search/entities/episode.entity';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { Podcast } from './search/entities/podcast.entity';
         username: config.get('DB_USERNAME'),
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
-        entities: [Podcast],
+        entities: [Podcast, Episode],
         synchronize: true,
       }),
     }),
