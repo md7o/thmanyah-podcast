@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-// import { Podcast } from './search/podcast.entity';
-// import { SearchModule } from './search/search.module';
 import { SearchModule } from './search/search.module';
 import { Podcast } from './search/entities/podcast.entity';
 import { Episode } from './search/entities/episode.entity';
@@ -23,7 +21,7 @@ import { Episode } from './search/entities/episode.entity';
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
         entities: [Podcast, Episode],
-        synchronize: true,
+        // synchronize: true,
       }),
     }),
     SearchModule,
