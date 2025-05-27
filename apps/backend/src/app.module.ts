@@ -21,7 +21,7 @@ import { Episode } from './search/entities/episode.entity';
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
         entities: [Podcast, Episode],
-        synchronize: true,
+        synchronize: false,
       }),
     }),
     SearchModule,
