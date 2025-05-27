@@ -16,7 +16,7 @@ import Link from "next/link";
 const items = [
   {
     title: "Home",
-    url: "#",
+    url: "/",
     icon: Home,
   },
   {
@@ -55,7 +55,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
-                    className="hover:bg-gradient-to-r from-pink-400/10 to-transparent duration-300"
+                    className="hover:bg-gradient-to-l from-pink-400/10 to-transparent duration-300"
                   >
                     <a href={item.url} className="flex items-center gap-3">
                       <item.icon className="stroke-1 w-5 h-5 flex-shrink-0" />

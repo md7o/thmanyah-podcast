@@ -10,6 +10,8 @@ import gsap from "gsap";
 export default function TopPodcasts() {
   const [results, setResults] = useState<Podcast[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [clickedPodcastId, setClickedPodcastId] = useState<number | null>(null);
+
   const cardsRef = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
@@ -40,7 +42,7 @@ export default function TopPodcasts() {
           x: 0,
           ease: "power2.out",
           duration: 0.7,
-          // stagger: 0.1,
+          stagger: 0.1,
         }
       );
     }
@@ -68,6 +70,11 @@ export default function TopPodcasts() {
 
   return (
     <div className="mt-10">
+      {clickedPodcastId && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 animate-fade-in">
+          <div className="w-14 h-14 border-2 border-t-bg1 border-gray-300 rounded-full animate-spin" />
+        </div>
+      )}
       <div className="flex justify-between items-center px-5">
         <h3 className="pb-5">أفضل البودكاستات لفنجان</h3>
         <LayoutDropDown
@@ -90,6 +97,7 @@ export default function TopPodcasts() {
               >
                 <Link
                   href={`/podcast/${podcast.itunes_id}`}
+                  onClick={() => setClickedPodcastId(podcast.itunes_id)}
                   className="text-white group block hover:scale-[1.02] transition-transform duration-300"
                   aria-label={`View ${podcast.title} podcast`}
                 >

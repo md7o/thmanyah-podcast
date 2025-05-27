@@ -12,6 +12,7 @@ export default function TopEpisods() {
   const [results, setResults] = useState<Podcast[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const cardsRef = useRef<HTMLDivElement[]>([]);
+  const [clickedPodcastId, setClickedPodcastId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetch = async () => {
@@ -29,15 +30,36 @@ export default function TopEpisods() {
     fetch();
   }, []);
 
+  useEffect(() => {
+    if (!isLoading && results.length > 0) {
+      gsap.fromTo(
+        cardsRef.current,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+
+          y: 0,
+          ease: "power2.out",
+          stagger: 0.04,
+          duration: 0.5,
+        }
+      );
+    }
+  }, [isLoading, results]);
+
   // useEffect(() => {
-  //   if (!isLoading && results.length > 0) {
+  //   const hasAnimated = sessionStorage.getItem("topEpisodesAnimated");
+
+  //   if (!isLoading && results.length > 0 && !hasAnimated) {
+  //     sessionStorage.setItem("topEpisodesAnimated", "true");
+
   //     requestAnimationFrame(() => {
+  //       const targets = cardsRef.current.filter(Boolean);
   //       gsap.fromTo(
-  //         cardsRef.current,
+  //         targets,
   //         { opacity: 0, y: 50 },
   //         {
   //           opacity: 1,
-
   //           y: 0,
   //           ease: "power2.out",
   //           stagger: 0.04,
@@ -47,29 +69,6 @@ export default function TopEpisods() {
   //     });
   //   }
   // }, [isLoading, results]);
-
-  useEffect(() => {
-    const hasAnimated = sessionStorage.getItem("topEpisodesAnimated");
-
-    if (!isLoading && results.length > 0 && !hasAnimated) {
-      sessionStorage.setItem("topEpisodesAnimated", "true");
-
-      requestAnimationFrame(() => {
-        const targets = cardsRef.current.filter(Boolean);
-        gsap.fromTo(
-          targets,
-          { opacity: 0, y: 50 },
-          {
-            opacity: 1,
-            y: 0,
-            ease: "power2.out",
-            stagger: 0.04,
-            duration: 0.5,
-          }
-        );
-      });
-    }
-  }, [isLoading, results]);
 
   if (isLoading) {
     return (
@@ -98,6 +97,11 @@ export default function TopEpisods() {
 
   return (
     <div className="mt-10">
+      {clickedPodcastId && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/50 animate-fade-in">
+          <div className="w-14 h-14 border-2 border-t-bg1 border-gray-300 rounded-full animate-spin" />
+        </div>
+      )}
       <div className="flex justify-between items-center px-5">
         <h3 className="pb-5 text-white">أفضل الحلقات لفنجان</h3>
         <LayoutDropDown currentLayout="compact" />
@@ -116,6 +120,7 @@ export default function TopEpisods() {
             >
               <Link
                 href={`/podcast/${podcast.itunes_id}`}
+                onClick={() => setClickedPodcastId(podcast.itunes_id)}
                 className="flex justify-between items-center py-3 rounded-xSmall hover:bg-active duration-300"
               >
                 <div className="flex items-center flex-1 gap-3 min-w-0 px-3">
