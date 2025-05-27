@@ -34,7 +34,7 @@ export class SearchService {
 
     for (const podcast of podcastsItems) {
       try {
-        await this.storeEpisodes(podcast); // يتم المحاولة لكل بودكاست
+        await this.storeEpisodes(podcast);
       } catch (err) {
         console.error('...');
       }
@@ -54,11 +54,9 @@ export class SearchService {
       .orderBy('id', 'ASC')
       .getMany();
 
-    // إذا مافيه نتائج → روح جيبها من iTunes وخزنها
     if (!podcasts.length) {
       await this.refresh(term);
 
-      // حاول تقرأ مرة ثانية بعد التخزين
       podcasts = await this.podcastRepo
         .createQueryBuilder('podcast')
         .where('podcast.title ILIKE :term', { term: `%${term}%` })
@@ -103,7 +101,7 @@ export class SearchService {
           '',
       }));
     } catch (err) {
-      console.error(`❌ Failed to fetch RSS from ${feedUrl}:`, err.message);
+      console.error(`Failed to fetch RSS from ${feedUrl}:`, err.message);
       return [];
     }
   }
@@ -117,11 +115,10 @@ export class SearchService {
     const episodesData = await this.fetchEpisodesFromFeed(podcast.feed_url);
 
     if (!episodesData.length) {
-      console.warn(`⚠️ لا توجد حلقات تم解析ها من RSS: ${podcast.title}`);
+      console.warn(`There is no episodes in RSS: ${podcast.title}`);
       return;
     }
 
-    // احذف الحلقات القديمة المرتبطة بنفس البودكاست
     await this.episodeRepo.delete({ podcast: { id: podcast.id } });
 
     const episodes = episodesData.map((ep) => {
@@ -130,7 +127,7 @@ export class SearchService {
         ep['media:thumbnail']?.['$']?.url ||
         ep['image']?.url ||
         ep.imageUrl ||
-        ''; // لو جاي من fetchEpisodesFromFeed
+        '';
 
       return this.episodeRepo.create({
         title: ep.title ?? '',
@@ -143,11 +140,6 @@ export class SearchService {
     });
 
     await this.episodeRepo.save(episodes);
-
-    console.log(`📡 محاولة تخزين: ${podcast.title} - ${podcast.feed_url}`);
-    console.log(
-      `✅ تم تخزين ${episodes.length} حلقة للبودكاست: ${podcast.title}`,
-    );
   }
 
   async searchById(itunes_id: number): Promise<Podcast> {
@@ -228,24 +220,3 @@ export class SearchService {
     );
   }
 }
-
-// async search(term: string): Promise<Podcast[]> {
-//     if (!term) {
-//       throw new NotFoundException('Search term is required');
-//     }
-
-//     // Full text search by term
-//     const podcasts = await this.podcastRepo
-//       .createQueryBuilder('podcast')
-//       .orderBy('id', 'ASC')
-//       .where('podcast.title ILIKE :term', { term: `%${term}%` })
-//       .orWhere('podcast.description ILIKE :term', { term: `%${term}%` })
-//       .orWhere('podcast.publisher ILIKE :term', { term: `%${term}%` })
-//       .getMany();
-
-//     if (podcasts.length === 0) {
-//       throw new NotFoundException('No podcasts found for the given term');
-//     }
-
-//     return podcasts;
-//   }
